@@ -1,5 +1,5 @@
 # eGator-face-id
-eGator financeverification system
+merge-system-NRT1432
 ## Running the development environment
 
 > Note:: Ensure you have docker and docker-compose installed.
@@ -7,7 +7,7 @@ eGator financeverification system
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/eGator-finance/eGator-verification-system
+git clone https://github.com/teemezzy/merge-system-NRT1432
 ```
 
 ### 2. Build the docker image
