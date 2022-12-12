@@ -1,0 +1,78 @@
+version: '3'
+
+services:
+  backend:
+    depends_on:
+      - postgres
+    environment:
+      ENVIRONMENT: "local"
+      DASHBOARD_HOST: "http://localhost:3000"
+      JWT_SECRET_KEY: "ktUTtpqNoKVLKoATO45v8gxmyK_MBMOqFbVpCqTbqKk="
+      ENCODING_KEY: "snEaUSiYRF34ywxF7BAaD4fpZfasQSZkDd3Qjj_TomI="
+      POSTGRES_SERVER: "postgres"
+      POSTGRES_USER: "egator"
+      POSTGRES_PASSWORD: "egator"
+      POSTGRES_DB: "egator"
+      LOG_LEVEL: "info"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app
+    build:
+      context: ./backend
+      # dockerfile: backend.dockerfile
+      args:
+        - ENVIRONMENT=local
+    command: ./start-reload.sh
+
+  frontend:
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/usr/src/app
+    restart: always
+    ports:
+      - "3000:3000"
+    build:
+      context: ./frontend
+      # dockerfile: frontend.dockerfile
+    environment:
+      ENVIRONMENT: local
+      NEXT_PUBLIC_ENVIRONMENT: local
+      REACT_APP_ENVIRONMENT: local
+      API_URL: http://backend
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    # command: sh -c "while true; do sleep 1; done"  # Infinite loop to keep container live doing nothing
+    command: ["sh", "-c", "yarn && yarn dev"]
+
+  postgres:
+    image: postgres:13-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: egator
+      POSTGRES_USER: egator
+    volumes:
+      - postgresql:/var/lib/postgresql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:5050"
+    environment:
+      PGADMIN_LISTEN_PORT: 5050
+      POSTGRES_SERVER: "postgres"
+      POSTGRES_USER: "egator"
+      POSTGRES_PASSWORD: "egator"
+      POSTGRES_DB: "egator"
+      PGADMIN_DEFAULT_EMAIL: "developer@egator.com"
+      PGADMIN_DEFAULT_PASSWORD: "egator"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+volumes:
+  pgadmin:
+  postgresql:
